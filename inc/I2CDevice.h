@@ -14,6 +14,7 @@ class I2CDevice
 private:
 	uint8_t m_uBusNumber;
 	uint8_t m_uDeviceId;
+	int32_t m_iDeviceFile;
 
 public:
 	I2CDevice(uint8_t auBusNumber, uint16_t auDeviceId);
@@ -22,9 +23,9 @@ public:
 	virtual void Close(void);
 	virtual uint8_t Write(uint8_t auValue);
 	virtual uint8_t WriteRegister(uint8_t auRegisterAddress, uint8_t auValue);
-	virtual uint8_t ReadRegister(uint8_t auRegisterAddress);
-	virtual uint8_t* ReadRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters);
-	virtual void DumpRegisters(uint8_t auNumRegisters);
+	virtual uint8_t ReadRegister(uint8_t auRegisterAddress, uint8_t* apuReadValue);
+	virtual uint8_t ReadRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters, uint8_t* apuReadValues);
+	virtual uint8_t DumpRegisters(uint8_t auNumRegisters);
 };
 
 
