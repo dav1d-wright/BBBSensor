@@ -12,7 +12,248 @@
 /*----------------------------------------------------------------------------*/
 /* definitions */
 /*----------------------------------------------------------------------------*/
+// Address defines
+#define DF_BME280_I2C_ADDRESS1                  		0x76U
+#define DF_BME280_I2C_ADDRESS2                  		0x77U
 
+// Power mode defines
+#define DF_BME280_SLEEP_MODE                    		0x00U
+#define DF_BME280_FORCED_MODE                   		0x01U
+#define DF_BME280_NORMAL_MODE                   		0x03U
+#define DF_BME280_SOFT_RESET_CODE               		0xB6U
+
+// standby defines
+#define DF_BME280_STANDBY_TIME_1_MS             		0x00U
+#define DF_BME280_STANDBY_TIME_63_MS            		0x01U
+#define DF_BME280_STANDBY_TIME_125_MS			 		0x02U
+#define DF_BME280_STANDBY_TIME_250_MS            		0x03U
+#define DF_BME280_STANDBY_TIME_500_MS            		0x04U
+#define DF_BME280_STANDBY_TIME_1000_MS           		0x05U
+#define DF_BME280_STANDBY_TIME_10_MS             		0x06U
+#define DF_BME280_STANDBY_TIME_20_MS             		0x07U
+
+// oversampling defines
+#define DF_BME280_OVERSAMP_SKIPPED          			0x00U
+#define DF_BME280_OVERSAMP_1X               			0x01U
+#define DF_BME280_OVERSAMP_2X               			0x02U
+#define DF_BME280_OVERSAMP_4X               			0x03U
+#define DF_BME280_OVERSAMP_8X               			0x04U
+#define DF_BME280_OVERSAMP_16X              			0x05U
+
+// work mode defines
+#define DF_BME280_ULTRALOWPOWER_MODE          			0x00U
+#define DF_BME280_LOWPOWER_MODE               			0x01U
+#define DF_BME280_STANDARDRESOLUTION_MODE     			0x02U
+#define DF_BME280_HIGHRESOLUTION_MODE         			0x03U
+#define DF_BME280_ULTRAHIGHRESOLUTION_MODE    			0x04U
+
+#define DF_BME280_ULTRALOWPOWER_OSRS_P          		DF_BME280_OVERSAMP_1X
+#define DF_BME280_ULTRALOWPOWER_OSRS_T          		DF_BME280_OVERSAMP_1X
+
+#define DF_BME280_LOWPOWER_OSRS_P               		DF_BME280_OVERSAMP_2X
+#define DF_BME280_LOWPOWER_OSRS_T               		DF_BME280_OVERSAMP_1X
+
+#define DF_BME280_STANDARDRESOLUTION_OSRS_P     		DF_BME280_OVERSAMP_4X
+#define DF_BME280_STANDARDRESOLUTION_OSRS_T     		DF_BME280_OVERSAMP_1X
+
+#define DF_BME280_HIGHRESOLUTION_OSRS_P         		DF_BME280_OVERSAMP_8X
+#define DF_BME280_HIGHRESOLUTION_OSRS_T         		DF_BME280_OVERSAMP_1X
+
+#define DF_BME280_ULTRAHIGHRESOLUTION_OSRS_P    		DF_BME280_OVERSAMP_16X
+#define DF_BME280_ULTRAHIGHRESOLUTION_OSRS_T    		DF_BME280_OVERSAMP_2X
+
+#define DF_BME280_STANDARD_OVERSAMP_HUMIDITY			DF_BME280_OVERSAMP_1X
+
+// filter defines
+#define DF_BME280_FILTER_COEFF_OFF               		0x00U
+#define DF_BME280_FILTER_COEFF_2                 		0x01U
+#define DF_BME280_FILTER_COEFF_4                 		0x02U
+#define DF_BME280_FILTER_COEFF_8                 		0x03U
+#define DF_BME280_FILTER_COEFF_16                		0x04U
+
+// delay defines
+#define DF_BME280_T_INIT_MAX                            20		/* 20/16 = 1.25 ms */
+#define DF_BME280_T_MEASURE_PER_OSRS_MAX                37		/* 37/16 = 2.3125 ms*/
+#define DF_BME280_T_SETUP_PRESSURE_MAX                  10		/* 10/16 = 0.625 ms */
+#define DF_BME280_T_SETUP_HUMIDITY_MAX                  10		/* 10/16 = 0.625 ms */
+
+// defines for array size of data
+#define	DF_BME280_HUMIDITY_DATA_SIZE					2
+#define	DF_BME280_TEMPERATURE_DATA_SIZE					3
+#define	DF_BME280_PRESSURE_DATA_SIZE					3
+#define	DF_BME280_DATA_FRAME_SIZE						8
+/**< data frames includes temperature,
+pressure and humidity*/
+#define	DF_BME280_CALIB_DATA_SIZE						26
+
+#define	DF_BME280_TEMPERATURE_MSB_DATA					0
+#define	DF_BME280_TEMPERATURE_LSB_DATA					1
+#define	DF_BME280_TEMPERATURE_XLSB_DATA					2
+#define	DF_BME280_PRESSURE_MSB_DATA						0
+#define	DF_BME280_PRESSURE_LSB_DATA						1
+#define	DF_BME280_PRESSURE_XLSB_DATA	    			2
+#define	DF_BME280_HUMIDITY_MSB_DATA						0
+#define	DF_BME280_HUMIDITY_LSB_DATA						1
+
+#define	DF_BME280_DATA_FRAME_PRESSURE_MSB_BYTE	    	0
+#define	DF_BME280_DATA_FRAME_PRESSURE_LSB_BYTE			1
+#define	DF_BME280_DATA_FRAME_PRESSURE_XLSB_BYTE			2
+#define	DF_BME280_DATA_FRAME_TEMPERATURE_MSB_BYTE		3
+#define	DF_BME280_DATA_FRAME_TEMPERATURE_LSB_BYTE		4
+#define	DF_BME280_DATA_FRAME_TEMPERATURE_XLSB_BYTE		5
+#define	DF_BME280_DATA_FRAME_HUMIDITY_MSB_BYTE			6
+#define	DF_BME280_DATA_FRAME_HUMIDITY_LSB_BYTE			7
+
+// defines for array parameters for calibration
+#define	DF_BME280_TEMPERATURE_CALIB_DIG_T1_LSB			0
+#define	DF_BME280_TEMPERATURE_CALIB_DIG_T1_MSB			1
+#define	DF_BME280_TEMPERATURE_CALIB_DIG_T2_LSB			2
+#define	DF_BME280_TEMPERATURE_CALIB_DIG_T2_MSB			3
+#define	DF_BME280_TEMPERATURE_CALIB_DIG_T3_LSB			4
+#define	DF_BME280_TEMPERATURE_CALIB_DIG_T3_MSB			5
+#define	DF_BME280_PRESSURE_CALIB_DIG_P1_LSB       		6
+#define	DF_BME280_PRESSURE_CALIB_DIG_P1_MSB       		7
+#define	DF_BME280_PRESSURE_CALIB_DIG_P2_LSB       		8
+#define	DF_BME280_PRESSURE_CALIB_DIG_P2_MSB       		9
+#define	DF_BME280_PRESSURE_CALIB_DIG_P3_LSB       		10
+#define	DF_BME280_PRESSURE_CALIB_DIG_P3_MSB       		11
+#define	DF_BME280_PRESSURE_CALIB_DIG_P4_LSB       		12
+#define	DF_BME280_PRESSURE_CALIB_DIG_P4_MSB       		13
+#define	DF_BME280_PRESSURE_CALIB_DIG_P5_LSB       		14
+#define	DF_BME280_PRESSURE_CALIB_DIG_P5_MSB       		15
+#define	DF_BME280_PRESSURE_CALIB_DIG_P6_LSB       		16
+#define	DF_BME280_PRESSURE_CALIB_DIG_P6_MSB       		17
+#define	DF_BME280_PRESSURE_CALIB_DIG_P7_LSB       		18
+#define	DF_BME280_PRESSURE_CALIB_DIG_P7_MSB       		19
+#define	DF_BME280_PRESSURE_CALIB_DIG_P8_LSB       		20
+#define	DF_BME280_PRESSURE_CALIB_DIG_P8_MSB       		21
+#define	DF_BME280_PRESSURE_CALIB_DIG_P9_LSB       		22
+#define	DF_BME280_PRESSURE_CALIB_DIG_P9_MSB       		23
+#define	DF_BME280_HUMIDITY_CALIB_DIG_H1           		25
+#define	DF_BME280_HUMIDITY_CALIB_DIG_H2_LSB				0
+#define	DF_BME280_HUMIDITY_CALIB_DIG_H2_MSB				1
+#define	DF_BME280_HUMIDITY_CALIB_DIG_H3					2
+#define	DF_BME280_HUMIDITY_CALIB_DIG_H4_MSB				3
+#define	DF_BME280_HUMIDITY_CALIB_DIG_H4_LSB				4
+#define	DF_BME280_HUMIDITY_CALIB_DIG_H5_MSB				5
+#define	DF_BME280_HUMIDITY_CALIB_DIG_H6					6
+#define	DF_BME280_MASK_DIG_H4							0x0F
+
+// calibration register address defines
+#define DF_BME280_TEMPERATURE_CALIB_DIG_T1_LSB_REG      0x88
+#define DF_BME280_TEMPERATURE_CALIB_DIG_T1_MSB_REG      0x89
+#define DF_BME280_TEMPERATURE_CALIB_DIG_T2_LSB_REG      0x8A
+#define DF_BME280_TEMPERATURE_CALIB_DIG_T2_MSB_REG      0x8B
+#define DF_BME280_TEMPERATURE_CALIB_DIG_T3_LSB_REG      0x8C
+#define DF_BME280_TEMPERATURE_CALIB_DIG_T3_MSB_REG      0x8D
+#define DF_BME280_PRESSURE_CALIB_DIG_P1_LSB_REG         0x8E
+#define DF_BME280_PRESSURE_CALIB_DIG_P1_MSB_REG         0x8F
+#define DF_BME280_PRESSURE_CALIB_DIG_P2_LSB_REG         0x90
+#define DF_BME280_PRESSURE_CALIB_DIG_P2_MSB_REG         0x91
+#define DF_BME280_PRESSURE_CALIB_DIG_P3_LSB_REG         0x92
+#define DF_BME280_PRESSURE_CALIB_DIG_P3_MSB_REG         0x93
+#define DF_BME280_PRESSURE_CALIB_DIG_P4_LSB_REG         0x94
+#define DF_BME280_PRESSURE_CALIB_DIG_P4_MSB_REG         0x95
+#define DF_BME280_PRESSURE_CALIB_DIG_P5_LSB_REG         0x96
+#define DF_BME280_PRESSURE_CALIB_DIG_P5_MSB_REG         0x97
+#define DF_BME280_PRESSURE_CALIB_DIG_P6_LSB_REG         0x98
+#define DF_BME280_PRESSURE_CALIB_DIG_P6_MSB_REG         0x99
+#define DF_BME280_PRESSURE_CALIB_DIG_P7_LSB_REG         0x9A
+#define DF_BME280_PRESSURE_CALIB_DIG_P7_MSB_REG         0x9B
+#define DF_BME280_PRESSURE_CALIB_DIG_P8_LSB_REG         0x9C
+#define DF_BME280_PRESSURE_CALIB_DIG_P8_MSB_REG         0x9D
+#define DF_BME280_PRESSURE_CALIB_DIG_P9_LSB_REG         0x9E
+#define DF_BME280_PRESSURE_CALIB_DIG_P9_MSB_REG         0x9F
+
+#define DF_BME280_HUMIDITY_CALIB_DIG_H1_REG             0xA1
+
+#define DF_BME280_HUMIDITY_CALIB_DIG_H2_LSB_REG         0xE1
+#define DF_BME280_HUMIDITY_CALIB_DIG_H2_MSB_REG         0xE2
+#define DF_BME280_HUMIDITY_CALIB_DIG_H3_REG             0xE3
+#define DF_BME280_HUMIDITY_CALIB_DIG_H4_MSB_REG         0xE4
+#define DF_BME280_HUMIDITY_CALIB_DIG_H4_LSB_REG         0xE5
+#define DF_BME280_HUMIDITY_CALIB_DIG_H5_MSB_REG         0xE6
+#define DF_BME280_HUMIDITY_CALIB_DIG_H6_REG             0xE7
+
+// register address defines
+#define DF_BME280_CHIP_ID_REG                           0xD0  /*Chip ID Register */
+#define DF_BME280_RST_REG                               0xE0  /*Softreset Register */
+#define DF_BME280_STAT_REG                              0xF3  /*Status Register */
+#define DF_BME280_CTRL_MEAS_REG                         0xF4  /*Ctrl Measure Register */
+#define DF_BME280_CTRL_HUMIDITY_REG                     0xF2  /*Ctrl Humidity Register*/
+#define DF_BME280_CONFIG_REG                            0xF5  /*Configuration Register */
+#define DF_BME280_PRESSURE_MSB_REG                      0xF7  /*Pressure MSB Register */
+#define DF_BME280_PRESSURE_LSB_REG                      0xF8  /*Pressure LSB Register */
+#define DF_BME280_PRESSURE_XLSB_REG                     0xF9  /*Pressure XLSB Register */
+#define DF_BME280_TEMPERATURE_MSB_REG                   0xFA  /*Temperature MSB Reg */
+#define DF_BME280_TEMPERATURE_LSB_REG                   0xFB  /*Temperature LSB Reg */
+#define DF_BME280_TEMPERATURE_XLSB_REG                  0xFC  /*Temperature XLSB Reg */
+#define DF_BME280_HUMIDITY_MSB_REG                      0xFD  /*Humidity MSB Reg */
+#define DF_BME280_HUMIDITY_LSB_REG                      0xFE  /*Humidity LSB Reg */
+
+// bit mask, length and position defines
+#define DF_BME280_STAT_REG_MEASURING__POS               3
+#define DF_BME280_STAT_REG_MEASURING__MSK               0x08
+#define DF_BME280_STAT_REG_MEASURING__LEN               1
+#define DF_BME280_STAT_REG_MEASURING__REG               DF_BME280_STAT_REG
+
+#define DF_BME280_STAT_REG_IM_UPDATE__POS               0
+#define DF_BME280_STAT_REG_IM_UPDATE__MSK               0x01
+#define DF_BME280_STAT_REG_IM_UPDATE__LEN               1
+#define DF_BME280_STAT_REG_IM_UPDATE__REG               DF_BME280_STAT_REG
+
+// bit mask, length and position defines for temperature oversampling
+#define DF_BME280_CTRL_MEAS_REG_OVERSAMP_TEMP__POS	    5
+#define DF_BME280_CTRL_MEAS_REG_OVERSAMP_TEMP__MSK	    0xE0
+#define DF_BME280_CTRL_MEAS_REG_OVERSAMP_TEMP__LEN	    3
+#define DF_BME280_CTRL_MEAS_REG_OVERSAMP_TEMP__REG	    DF_BME280_CTRL_MEAS_REG
+
+// bit mask, length and position defines for pressure oversampling
+#define DF_BME280_CTRL_MEAS_REG_OVERSAMP_PRESSURE__POS  2
+#define DF_BME280_CTRL_MEAS_REG_OVERSAMP_PRESSURE__MSK  0x1C
+#define DF_BME280_CTRL_MEAS_REG_OVERSAMP_PRESSURE__LEN  3
+#define DF_BME280_CTRL_MEAS_REG_OVERSAMP_PRESSURE__REG  DF_BME280_CTRL_MEAS_REG
+
+// bit mask, length and position defines for power mode
+#define DF_BME280_CTRL_MEAS_REG_POWER_MODE__POS         0
+#define DF_BME280_CTRL_MEAS_REG_POWER_MODE__MSK         0x03
+#define DF_BME280_CTRL_MEAS_REG_POWER_MODE__LEN         2
+#define DF_BME280_CTRL_MEAS_REG_POWER_MODE__REG         DF_BME280_CTRL_MEAS_REG
+
+// bit mask, length and position defines for humidity oversampling
+#define DF_BME280_CTRL_HUMID_REG_OVERSAMP_HUMID__POS    0
+#define DF_BME280_CTRL_HUMID_REG_OVERSAMP_HUMID__MSK    0x07
+#define DF_BME280_CTRL_HUMID_REG_OVERSAMP_HUMID__LEN    3
+#define DF_BME280_CTRL_HUMID_REG_OVERSAMP_HUMID__REG   	DF_BME280_CTRL_HUMIDITY_REG
+
+// bit mask, length and position defines for standby time
+#define DF_BME280_CONFIG_REG_TSB__POS                   5
+#define DF_BME280_CONFIG_REG_TSB__MSK                   0xE0
+#define DF_BME280_CONFIG_REG_TSB__LEN                   3
+#define DF_BME280_CONFIG_REG_TSB__REG                   DF_BME280_CONFIG_REG
+
+// bit mask, length and position defines for filter
+#define DF_BME280_CONFIG_REG_FILTER__POS                2
+#define DF_BME280_CONFIG_REG_FILTER__MSK                0x1C
+#define DF_BME280_CONFIG_REG_FILTER__LEN                3
+#define DF_BME280_CONFIG_REG_FILTER__REG                DF_BME280_CONFIG_REG
+
+// bit mask, length and position defines for spi enable
+#define DF_BME280_CONFIG_REG_SPI3_ENABLE__POS           0
+#define DF_BME280_CONFIG_REG_SPI3_ENABLE__MSK           0x01
+#define DF_BME280_CONFIG_REG_SPI3_ENABLE__LEN           1
+#define DF_BME280_CONFIG_REG_SPI3_ENABLE__REG           DF_BME280_CONFIG_REG
+
+// bit mask, length and position defines for pressure   and temperature data
+#define DF_BME280_PRESSURE_XLSB_REG_DATA__POS           4
+#define DF_BME280_PRESSURE_XLSB_REG_DATA__MSK           0xF0
+#define DF_BME280_PRESSURE_XLSB_REG_DATA__LEN           4
+#define DF_BME280_PRESSURE_XLSB_REG_DATA__REG           DF_BME280_PRESSURE_XLSB_REG
+
+#define DF_BME280_TEMPERATURE_XLSB_REG_DATA__POS        4
+#define DF_BME280_TEMPERATURE_XLSB_REG_DATA__MSK        0xF0
+#define DF_BME280_TEMPERATURE_XLSB_REG_DATA__LEN        4
+#define DF_BME280_TEMPERATURE_XLSB_REG_DATA__REG        DF_BME280_TEMPERATURE_XLSB_REG
 
 /*----------------------------------------------------------------------------*/
 /* global variables */
