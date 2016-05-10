@@ -15,9 +15,9 @@
 #include <iostream>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include<unistd.h>
-#include<linux/i2c.h>
-#include<linux/i2c-dev.h>
+#include <unistd.h>
+#include <linux/i2c.h>
+#include <linux/i2c-dev.h>
 using namespace std;
 /*----------------------------------------------------------------------------*/
 /* definitions */
@@ -39,7 +39,6 @@ I2CDevice::I2CDevice(uint8_t auBusNumber, uint16_t auDeviceId):
 m_uBusNumber(auBusNumber), m_uDeviceId(auDeviceId)
 {
 	m_iDeviceFile = -1;
-	this->Open();
 }
 
 I2CDevice::~I2CDevice(void)

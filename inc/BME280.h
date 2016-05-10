@@ -10,7 +10,7 @@
 /*----------------------------------------------------------------------------*/
 /* includes */
 /*----------------------------------------------------------------------------*/
-
+#include <I2CDevice.h>
 /*----------------------------------------------------------------------------*/
 /* precompiler definitions */
 /*----------------------------------------------------------------------------*/
@@ -82,6 +82,7 @@ private:
 public:
 	BME280(uint8_t auBusNumber, uint16_t auDeviceId);
 	~BME280(void);
+	uint8_t Init(void);
 	uint8_t GetAllCalibrationValues(void);
 	uint8_t ReadAllValuesUncomp(void);
 	uint8_t CompensateAllValues(void);

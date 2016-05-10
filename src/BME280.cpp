@@ -8,10 +8,23 @@
 /* includes */
 /*----------------------------------------------------------------------------*/
 #include <stdint.h>
+#include <fstream>
+#include <BME280.h>
 
 /*----------------------------------------------------------------------------*/
 /* definitions */
 /*----------------------------------------------------------------------------*/
+// Numeric defines
+#define	DF_BME280_PRESS_TEMP_CALIB_DATA_LENGTH	        26
+#define	DF_BME280_HUMIDITY_CALIB_DATA_LENGTH	        7
+#define	DF_BME280_GEN_READ_WRITE_DATA_LENGTH		    1
+#define	DF_BME280_HUMIDITY_DATA_LENGTH				    2
+#define	DF_BME280_TEMPERATURE_DATA_LENGTH			    3
+#define	DF_BME280_PRESSURE_DATA_LENGTH				    3
+#define	DF_BME280_ALL_DATA_FRAME_LENGTH				    8
+#define	DF_BME280_INIT_VALUE						    0
+#define	DF_BME280_INVALID_DATA						    0
+
 // Address defines
 #define DF_BME280_I2C_ADDRESS1                  		0x76U
 #define DF_BME280_I2C_ADDRESS2                  		0x77U
@@ -268,3 +281,83 @@ pressure and humidity*/
 /*----------------------------------------------------------------------------*/
 /* implementations */
 /*----------------------------------------------------------------------------*/
+BME280::BME280(uint8_t auBusNumber, uint16_t auDeviceId):
+I2CDevice(auBusNumber, auDeviceId)
+{
+
+}
+
+BME280::~BME280(void)
+{
+
+}
+
+uint8_t BME280::Init(void)
+{
+	uint8_t uRetVal;
+
+	this->Open();
+
+	uRetVal = this->ReadRegisters(DF_BME280_CHIP_ID_REG, DF_BME280_GEN_READ_WRITE_DATA_LENGTH, &m_uChipId);
+
+	if(uRetVal == 0)
+	{
+		uRetVal = this->GetAllCalibrationValues();
+		if(uRetVal != 0)
+		{
+			perror("BME280: Could not get calibration values.\n");
+		}
+	}
+	else
+	{
+		perror("BME280: Could not read chip ID.\n");
+	}
+
+	return uRetVal;
+}
+
+uint8_t BME280::GetAllCalibrationValues(void)
+{
+
+}
+
+uint8_t BME280::ReadAllValuesUncomp(void)
+{
+
+}
+
+uint8_t BME280::CompensateAllValues(void)
+{
+
+}
+
+uint8_t BME280::ReadUncompTemperature(void)
+{
+
+}
+
+uint8_t BME280::CompensateTemperature(void)
+{
+
+}
+
+uint8_t BME280::ReadUncompPressure(void)
+{
+
+}
+
+uint8_t BME280::CompensatePressure(void)
+{
+
+}
+
+uint8_t BME280::ReadUncompHumidity(void)
+{
+
+}
+
+uint8_t BME280::CompensateHumidity(void)
+{
+
+}
+
