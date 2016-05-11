@@ -296,9 +296,16 @@ uint8_t BME280::Init(void)
 {
 	uint8_t uRetVal;
 
-	this->Open();
+	uRetVal = this->Open();
 
-	uRetVal = this->ReadRegisters(DF_BME280_CHIP_ID_REG, DF_BME280_GEN_READ_WRITE_DATA_LENGTH, &m_uChipId);
+	if (uRetVal == 0)
+	{
+		uRetVal = this->ReadRegisters(DF_BME280_CHIP_ID_REG, DF_BME280_GEN_READ_WRITE_DATA_LENGTH, &m_uChipId);
+	}
+	else
+	{
+		perror("BME280: Could not open I2C device.\n");
+	}
 
 	if(uRetVal == 0)
 	{
@@ -318,7 +325,83 @@ uint8_t BME280::Init(void)
 
 uint8_t BME280::GetAllCalibrationValues(void)
 {
+	uint8_t yuCalibParams[DF_BME280_CALIB_DATA_SIZE] = {0};
+	// Get calibration parameters for pressure and temperature, stored at register 0x88..0xA1
+	uint8_t uRetVal = this->ReadRegisters(DF_BME280_TEMPERATURE_CALIB_DIG_T1_LSB_REG,
+											DF_BME280_PRESS_TEMP_CALIB_DATA_LENGTH, yuCalibParams);
+	if(uRetVal != 0)
+	{
+		perror("BME280: Could not read pressure and temperature calibration data.\n");
+	}
+	else
+	{
+		// Assign read registers to internal calibration parameter structure
+		m_sCalibParams.m_uDigT1 = ((uint16_t)(((uint16_t)yuCalibParams[DF_BME280_TEMPERATURE_CALIB_DIG_T1_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_TEMPERATURE_CALIB_DIG_T1_LSB]);
 
+		m_sCalibParams.m_iDigT2 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_TEMPERATURE_CALIB_DIG_T2_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_TEMPERATURE_CALIB_DIG_T2_LSB]);
+
+		m_sCalibParams.m_iDigT3 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_TEMPERATURE_CALIB_DIG_T3_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_TEMPERATURE_CALIB_DIG_T3_LSB]);
+
+		m_sCalibParams.m_uDigP1 = ((uint16_t)(((uint16_t)yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P1_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P1_LSB]);
+
+		m_sCalibParams.m_iDigP2 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P2_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P2_LSB]);
+
+		m_sCalibParams.m_iDigP3 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P3_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P3_LSB]);
+
+		m_sCalibParams.m_iDigP4 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P4_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P4_LSB]);
+
+		m_sCalibParams.m_iDigP5 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P5_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P5_LSB]);
+
+		m_sCalibParams.m_iDigP6 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P6_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P6_LSB]);
+
+		m_sCalibParams.m_iDigP7 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P7_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P7_LSB]);
+
+		m_sCalibParams.m_iDigP8 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P8_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P8_LSB]);
+
+		m_sCalibParams.m_iDigP9 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P9_MSB]) << 8U)
+								| yuCalibParams[DF_BME280_PRESSURE_CALIB_DIG_P9_LSB]);
+
+		// dig_H1 register is part of the Pressure/Temperature block, at address 0xA1
+		m_sCalibParams.m_uDigH1 = yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H1];
+
+		// Get calibration parameters for pressure and temperature, stored at register 0x88..0xA1
+		uRetVal = this->ReadRegisters(DF_BME280_HUMIDITY_CALIB_DIG_H2_LSB_REG,
+										DF_BME280_HUMIDITY_CALIB_DATA_LENGTH, yuCalibParams);
+
+		if(uRetVal != 0)
+		{
+			perror("BME280: Could not read humidity calibration data.\n");
+		}
+		else
+		{
+			// Assign read registers to internal calibration parameter structure
+			m_sCalibParams.m_iDigH2 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H2_MSB]) << 8U)
+									| yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H2_LSB]);
+
+			m_sCalibParams.m_uDigH3 = yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H3];
+
+			m_sCalibParams.m_iDigH4 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H4_MSB]) << 4U)
+									| (DF_BME280_MASK_DIG_H4 & yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H4_LSB]));
+
+			m_sCalibParams.m_iDigH5 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H5_MSB]) << 4U)
+									| (yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H4_LSB] >> 4U));
+
+			m_sCalibParams.m_iDigH6 = (int16_t)(yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H6]);
+		}
+	}
+
+	return uRetVal;
 }
 
 uint8_t BME280::ReadAllValuesUncomp(void)
