@@ -19,13 +19,13 @@ private:
 public:
 	I2CDevice(uint8_t auBusNumber, uint16_t auDeviceId);
 	~I2CDevice(void);
-	virtual uint8_t Open(void);
+	virtual EError Open(void);
 	virtual void Close(void);
-	virtual uint8_t Write(uint8_t auValue);
-	virtual uint8_t WriteRegister(uint8_t auRegisterAddress, uint8_t auValue);
-	virtual uint8_t ReadRegister(uint8_t auRegisterAddress, uint8_t* apuReadValue);
-	virtual uint8_t ReadRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters, uint8_t* apuReadValues);
-	virtual uint8_t DumpRegisters(uint8_t auNumRegisters);
+	virtual EError Write(uint8_t auValue);
+	virtual EError WriteRegister(uint8_t auRegisterAddress, uint8_t auValue);
+	virtual EError ReadRegister(uint8_t auRegisterAddress, uint8_t* apuReadValue);
+	virtual EError ReadRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters, uint8_t* apuReadValues);
+	virtual EError DumpRegisters(uint8_t auNumRegisters);
 };
 
 

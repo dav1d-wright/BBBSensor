@@ -9,6 +9,7 @@
 /*----------------------------------------------------------------------------*/
 #include <stdint.h>
 #include <fstream>
+#include <Errors.h>
 #include <BME280.h>
 
 /*----------------------------------------------------------------------------*/
@@ -292,25 +293,25 @@ BME280::~BME280(void)
 
 }
 
-uint8_t BME280::Init(void)
+EError BME280::Init(void)
 {
-	uint8_t uRetVal;
+	EError eError;
 
-	uRetVal = this->Open();
+	eError = this->Open();
 
-	if (uRetVal == 0)
+	if (eError == 0)
 	{
-		uRetVal = this->ReadRegisters(DF_BME280_CHIP_ID_REG, DF_BME280_GEN_READ_WRITE_DATA_LENGTH, &m_uChipId);
+		eError = this->ReadRegisters(DF_BME280_CHIP_ID_REG, DF_BME280_GEN_READ_WRITE_DATA_LENGTH, &m_uChipId);
 	}
 	else
 	{
 		perror("BME280: Could not open I2C device.\n");
 	}
 
-	if(uRetVal == 0)
+	if(eError == 0)
 	{
-		uRetVal = this->GetAllCalibrationValues();
-		if(uRetVal != 0)
+		eError = this->GetAllCalibrationValues();
+		if(eError != 0)
 		{
 			perror("BME280: Could not get calibration values.\n");
 		}
@@ -320,20 +321,16 @@ uint8_t BME280::Init(void)
 		perror("BME280: Could not read chip ID.\n");
 	}
 
-	return uRetVal;
+	return eError;
 }
 
-uint8_t BME280::GetAllCalibrationValues(void)
+EError BME280::GetAllCalibrationValues(void)
 {
 	uint8_t yuCalibParams[DF_BME280_CALIB_DATA_SIZE] = {0};
 	// Get calibration parameters for pressure and temperature, stored at register 0x88..0xA1
-	uint8_t uRetVal = this->ReadRegisters(DF_BME280_TEMPERATURE_CALIB_DIG_T1_LSB_REG,
+	EError eError = this->ReadRegisters(DF_BME280_TEMPERATURE_CALIB_DIG_T1_LSB_REG,
 											DF_BME280_PRESS_TEMP_CALIB_DATA_LENGTH, yuCalibParams);
-	if(uRetVal != 0)
-	{
-		perror("BME280: Could not read pressure and temperature calibration data.\n");
-	}
-	else
+	if(eError == eErrOk)
 	{
 		// Assign read registers to internal calibration parameter structure
 		m_sCalibParams.m_uDigT1 = ((uint16_t)(((uint16_t)yuCalibParams[DF_BME280_TEMPERATURE_CALIB_DIG_T1_MSB]) << 8U)
@@ -376,14 +373,10 @@ uint8_t BME280::GetAllCalibrationValues(void)
 		m_sCalibParams.m_uDigH1 = yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H1];
 
 		// Get calibration parameters for pressure and temperature, stored at register 0x88..0xA1
-		uRetVal = this->ReadRegisters(DF_BME280_HUMIDITY_CALIB_DIG_H2_LSB_REG,
+		eError = this->ReadRegisters(DF_BME280_HUMIDITY_CALIB_DIG_H2_LSB_REG,
 										DF_BME280_HUMIDITY_CALIB_DATA_LENGTH, yuCalibParams);
 
-		if(uRetVal != 0)
-		{
-			perror("BME280: Could not read humidity calibration data.\n");
-		}
-		else
+		if(eError == eErrOk)
 		{
 			// Assign read registers to internal calibration parameter structure
 			m_sCalibParams.m_iDigH2 = ((int16_t)(((int16_t)yuCalibParams[DF_BME280_HUMIDITY_CALIB_DIG_H2_MSB]) << 8U)
@@ -401,45 +394,50 @@ uint8_t BME280::GetAllCalibrationValues(void)
 		}
 	}
 
-	return uRetVal;
+	return eError;
 }
 
-uint8_t BME280::ReadAllValuesUncomp(void)
+EError BME280::ReadAllValuesUncomp(void)
+{
+	EError eError = this->ReadUncompTemperature();
+
+	if(eError == eErrOk)
+	{
+
+	}
+}
+
+EError BME280::CompensateAllValues(void)
 {
 
 }
 
-uint8_t BME280::CompensateAllValues(void)
+EError BME280::ReadUncompTemperature(void)
 {
 
 }
 
-uint8_t BME280::ReadUncompTemperature(void)
+EError BME280::CompensateTemperature(void)
 {
 
 }
 
-uint8_t BME280::CompensateTemperature(void)
+EError BME280::ReadUncompPressure(void)
 {
 
 }
 
-uint8_t BME280::ReadUncompPressure(void)
+EError BME280::CompensatePressure(void)
 {
 
 }
 
-uint8_t BME280::CompensatePressure(void)
+EError BME280::ReadUncompHumidity(void)
 {
 
 }
 
-uint8_t BME280::ReadUncompHumidity(void)
-{
-
-}
-
-uint8_t BME280::CompensateHumidity(void)
+EError BME280::CompensateHumidity(void)
 {
 
 }

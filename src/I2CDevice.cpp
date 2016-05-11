@@ -9,7 +9,6 @@
 /*----------------------------------------------------------------------------*/
 #include <stdint.h>
 #include <fstream>
-#include <I2CDevice.h>
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
 #include <iostream>
@@ -18,6 +17,9 @@
 #include <unistd.h>
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
+
+#include <Errors.h>
+#include <I2CDevice.h>
 using namespace std;
 /*----------------------------------------------------------------------------*/
 /* definitions */
@@ -49,9 +51,9 @@ I2CDevice::~I2CDevice(void)
 	}
 }
 
-uint8_t I2CDevice::Open(void)
+EError I2CDevice::Open(void)
 {
-	uint8_t uRetVal = 0;
+	EError eError = eErrOk;
 	string sName;
 	if(m_uBusNumber == 0)
 	{
@@ -64,30 +66,30 @@ uint8_t I2CDevice::Open(void)
 	else
 	{
 		perror("I2C: Incorrect bus number.\n");
-		uRetVal = 1;
+		eError = eErrI2CBusNumber;
 	}
 
-	if(uRetVal == 0)
+	if(eError == eErrOk)
 	{
 		m_iDeviceFile = open(sName.c_str(), O_RDWR);
 
 		if(m_iDeviceFile < 0)
 		{
 			perror("I2C: Failed to open the bus.\n");
-			uRetVal = 1;
+			eError = eErrI2CCannotOpenBus;
 		}
 
-		if(uRetVal == 0)
+		if(eError == eErrOk)
 		{
 			if(ioctl(m_iDeviceFile, I2C_SLAVE, m_uDeviceId) < 0)
 			{
 				perror("I2C: Failed to connect to the device.\n");
-				uRetVal = 1;
+				eError = eErrI2CCannotConnect;
 			}
 		}
 	}
 
-	return uRetVal;
+	return eError;
 }
 
 void I2CDevice::Close(void)
@@ -96,39 +98,39 @@ void I2CDevice::Close(void)
 	m_iDeviceFile = -1;
 }
 
-uint8_t I2CDevice::Write(uint8_t auValue)
+EError I2CDevice::Write(uint8_t auValue)
 {
-	uint8_t uRetVal = 0;
+	EError eError = eErrOk;
 
 	if(write(m_iDeviceFile, &auValue, 1) != 1)
 	{
 		perror("I2C: Failed to write to device.\n");
-		uRetVal = 1;
+		eError = eErrI2CCannotWrite;
 	}
-	return uRetVal;
+	return eError;
 }
 
-uint8_t I2CDevice::WriteRegister(uint8_t auRegisterAddress, uint8_t auValue)
+EError I2CDevice::WriteRegister(uint8_t auRegisterAddress, uint8_t auValue)
 {
-	uint8_t uRetVal = 0;
+	EError eError = eErrOk;
 	uint8_t yuBuffer[] = {auRegisterAddress, auValue};
 
 	if(write(m_iDeviceFile, yuBuffer, 2) != 2)
 	{
 		perror("I2C: Failed to write to device.\n");
-		uRetVal = 1;
+		eError = eErrI2CCannotWrite;
 	}
-	return uRetVal;
+	return eError;
 }
 
-uint8_t I2CDevice::ReadRegister(uint8_t auRegisterAddress, uint8_t* apuReadValue)
+EError I2CDevice::ReadRegister(uint8_t auRegisterAddress, uint8_t* apuReadValue)
 {
 	return this->ReadRegisters(auRegisterAddress, 1, apuReadValue);
 }
 
-uint8_t I2CDevice::ReadRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters, uint8_t* apuReadValues)
+EError I2CDevice::ReadRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters, uint8_t* apuReadValues)
 {
-	uint8_t uRetVal = 0;
+	EError eError = eErrOk;
 
 	this->Write(auRegisterAddress);
 
@@ -136,25 +138,22 @@ uint8_t I2CDevice::ReadRegisters(uint8_t auRegisterAddress, uint8_t auNumRegiste
 	{
 		perror("I2C: Failed to read values from device register.\n");
 		apuReadValues = NULL;
-		uRetVal = 1;
+		eError = eErrI2CCannotRead;
 	}
-	return 0;
+
+	return eError;
 }
 
-uint8_t I2CDevice::DumpRegisters(uint8_t auNumRegisters)
+EError I2CDevice::DumpRegisters(uint8_t auNumRegisters)
 {
-	uint8_t uRetVal = 0;
+	EError eError = eErrOk;
 	uint8_t* yuRegisters = new uint8_t[auNumRegisters];
 
 	cout << "Dumping registers for debug purposes." << endl;
 
-	if(this->ReadRegisters(0, auNumRegisters, yuRegisters) != 0)
-	{
-		perror("I2C: Reading registers for dump failed.\n");
-		yuRegisters = NULL;
-		uRetVal = 1;
-	}
-	else
+	eError = this->ReadRegisters(0, auNumRegisters, yuRegisters);
+
+	if(eError != eErrOk)
 	{
 		for(uint8_t uLoop = 0; uLoop < auNumRegisters; uLoop++)
 		{
@@ -168,5 +167,5 @@ uint8_t I2CDevice::DumpRegisters(uint8_t auNumRegisters)
 
 	delete[] yuRegisters;
 
-	return uRetVal;
+	return eError;
 }

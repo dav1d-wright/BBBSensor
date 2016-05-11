@@ -82,16 +82,16 @@ private:
 public:
 	BME280(uint8_t auBusNumber, uint16_t auDeviceId);
 	~BME280(void);
-	uint8_t Init(void);
-	uint8_t GetAllCalibrationValues(void);
-	uint8_t ReadAllValuesUncomp(void);
-	uint8_t CompensateAllValues(void);
-	uint8_t ReadUncompTemperature(void);
-	uint8_t CompensateTemperature(void);
-	uint8_t ReadUncompPressure(void);
-	uint8_t CompensatePressure(void);
-	uint8_t ReadUncompHumidity(void);
-	uint8_t CompensateHumidity(void);
+	EError Init(void);
+	EError GetAllCalibrationValues(void);
+	EError ReadAllValuesUncomp(void);
+	EError CompensateAllValues(void);
+	EError ReadUncompTemperature(void);
+	EError CompensateTemperature(void);
+	EError ReadUncompPressure(void);
+	EError CompensatePressure(void);
+	EError ReadUncompHumidity(void);
+	EError CompensateHumidity(void);
 };
 
 

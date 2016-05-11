@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <stdint.h>
+#include <Errors.h>
 #include <BME280.h>
 
 using namespace std;
