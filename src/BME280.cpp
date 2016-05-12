@@ -453,6 +453,12 @@ EError BME280::ReadUncompTemperature(void)
 	return eError;
 }
 
+EError BME280::CompensateTemperature(void)
+{
+	EError eError = eErrOk;
+	return eError;
+}
+
 void BME280::CompensateTemperatureI32(void)
 {
 	int32_t iTempVal1 = 0;
@@ -468,6 +474,12 @@ void BME280::CompensateTemperatureI32(void)
 	m_sCalibParams.m_iTFine = iTempVal1 + iTempVal2;
 	/* calculate temperature */
 	m_iTempComp = (m_sCalibParams.m_iTFine * 5 + 128) >> 8;
+}
+
+EError BME280::CompensateTemperatureDouble(void)
+{
+	EError eError = eErrOk;
+	return eError;
 }
 
 EError BME280::ReadUncompPressure(void)
@@ -492,9 +504,71 @@ EError BME280::ReadUncompPressure(void)
 	return eError;
 }
 
+EError BME280::CompensatePressure(void)
+{
+	EError eError = eErrOk;
+	return eError;
+}
+
 EError BME280::CompensatePressureU32(void)
 {
+	EError eError = eErrOk;
+	int32_t iTempVal1;
+	int32_t iTempVal2;
 
+	/* calculate temp value 1 */
+	iTempVal1 = (((int32_t)m_sCalibParams.m_iTFine) >> 1U) - ((int32_t)64000);
+	/* calculate temp value 2 */
+	iTempVal2 = (((iTempVal1 >> 2U) * (iTempVal1 >> 2U)) >> 11U) * ((int32_t)m_sCalibParams.m_iDigP6);
+	iTempVal2 =  iTempVal2 + ((iTempVal1 * ((int32_t)m_sCalibParams.m_iDigP5)) << 1U);
+	iTempVal2 = (iTempVal2 >> 2U) + (((int32_t)m_sCalibParams.m_iDigP4) << 16U);
+	/* calculate temp value 1 */
+	iTempVal1 = (((m_sCalibParams.m_iDigP3 * (((iTempVal1 >> 2U) * (iTempVal1 >> 2U)) >> 13U)) >> 3U) +
+			((((int32_t)m_sCalibParams.m_iDigP2) * iTempVal1) >> 1U)) >> 18U;
+	iTempVal1 = (((32768 + iTempVal1)) * ((int32_t)m_sCalibParams.m_uDigP1)) >> 15;
+	/* calculate pressure */
+	m_uPressComp = (((uint32_t)(((int32_t)1048576) - m_uPressUncomp) - (iTempVal2 >> 12))) * 3125;
+
+	if(m_uPressComp < 0x80000000)
+	{
+		/* avoid division by zero */
+		if(iTempVal1 != 0)
+		{
+			m_uPressComp = (m_uPressComp << 1U) / ((uint32_t)iTempVal1);
+		}
+		else
+		{
+			eError = eErrBME280PressCompDiv0;
+		}
+	}
+	else
+	{
+		/* avoid division by zero */
+		if(iTempVal1 != 0)
+		{
+			m_uPressComp = (m_uPressComp / ((uint32_t)iTempVal1)) * 2U;
+		}
+		else
+		{
+			eError = eErrBME280PressCompDiv0;
+		}
+	}
+
+	if(eError == eErrOk)
+	{
+		iTempVal1 = (((int32_t)m_sCalibParams.m_iDigP9) * ((int32_t)(((m_uPressComp >> 3U) * (m_uPressComp >> 3U)) >> 13U))) >> 12U;
+		iTempVal2 = (((int32_t)(m_uPressComp >> 2U)) * ((int32_t)m_sCalibParams.m_iDigP8)) >> 13U;
+
+		m_uPressComp = (uint32_t)((int32_t)m_uPressComp + ((iTempVal1 + iTempVal2 + m_sCalibParams.m_iDigP7) >> 4U));
+	}
+
+	return eError;
+}
+
+EError BME280::CompensatePressureDouble(void)
+{
+	EError eError = eErrOk;
+	return eError;
 }
 
 EError BME280::ReadUncompHumidity(void)
@@ -517,8 +591,19 @@ EError BME280::ReadUncompHumidity(void)
 	return eError;
 }
 
+EError BME280::CompensateHumidity(void)
+{
+	EError eError = eErrOk;
+	return eError;
+}
+
 EError BME280::CompensateHumidityU32(void)
 {
 
 }
 
+EError BME280::CompensateHumidityDouble(void)
+{
+	EError eError = eErrOk;
+	return eError;
+}

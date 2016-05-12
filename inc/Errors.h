@@ -15,10 +15,8 @@ typedef enum
 	eErrI2CCannotOpenBus,					/* Cannot open I2C bus */
 	eErrI2CCannotConnect,					/* Cannot connect to I2C device */
 	eErrI2CCannotWrite,						/* Cannot write to I2C device */
-	eErrI2CCannotRead						/* Cannot read from I2C device */
-
-
-
+	eErrI2CCannotRead,						/* Cannot read from I2C device */
+	eErrBME280PressCompDiv0					/* Division by zero during pressure compensation */
 }EError;
 
 
