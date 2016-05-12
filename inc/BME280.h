@@ -62,13 +62,13 @@ class BME280: public I2CDevice
 private:
 	int32_t m_iTempUncomp; 			// Uncompensated temperature value
 	int32_t m_iTempComp;			// Compensated temperature value in fixed point decimal
-	double m_dTempDoub;				// Compensated temperature value in double
+	double m_dTempComp;				// Compensated temperature value in double
 	uint32_t m_uPressUncomp;		// Uncompensated pressure value
 	uint32_t m_uPressComp;			// Compensated pressure value
-	double m_dPressDoub;			// Compensated pressure value in double point decimal
+	double m_dPressComp;			// Compensated pressure value in double point decimal
 	int32_t m_iHumidUncomp; 		// Uncompensated humidity value
 	uint32_t m_uHumidComp;			// Compensated humidity value in fixed point decimal
-	double m_dHumidDoub;			// Compensated humidity value in double
+	double m_dHumidComp;			// Compensated humidity value in double
 
 	uint8_t m_uTempOversampling;
 	uint8_t m_uPressOversampling;
@@ -77,8 +77,6 @@ private:
 	SBme280CalibParam m_sCalibParams;
 
 	uint8_t m_uChipId;
-
-
 public:
 	BME280(uint8_t auBusNumber, uint16_t auDeviceId);
 	~BME280(void);
@@ -88,10 +86,16 @@ public:
 	EError CompensateAllValues(void);
 	EError ReadUncompTemperature(void);
 	EError CompensateTemperature(void);
+	void CompensateTemperatureI32(void);
+	EError CompensateTemperatureDouble(void);
 	EError ReadUncompPressure(void);
 	EError CompensatePressure(void);
+	EError CompensatePressureU32(void);
+	EError CompensatePressureDouble(void);
 	EError ReadUncompHumidity(void);
 	EError CompensateHumidity(void);
+	EError CompensateHumidityU32(void);
+	EError CompensateHumidityDouble(void);
 };
 
 
