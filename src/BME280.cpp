@@ -403,18 +403,54 @@ EError BME280::ReadAllValuesUncomp(void)
 
 	if(eError == eErrOk)
 	{
-
+		eError = this->ReadUncompPressure();
 	}
+
+	if(eError == eErrOk)
+	{
+		eError = this->ReadUncompHumidity();
+	}
+
+	return eError;
 }
 
 EError BME280::CompensateAllValues(void)
 {
+	EError eError = this->CompensateTemperature();
 
+	if(eError == eErrOk)
+	{
+		eError = this->CompensatePressure();
+	}
+
+	if(eError == eErrOk)
+	{
+		eError = this->CompensateHumidity();
+	}
+
+	return eError;
 }
 
 EError BME280::ReadUncompTemperature(void)
 {
+	EError eError = eErrOk;
 
+	/* uTempData[0] - Temperature MSB
+	 * uTempData[1] - Temperature LSB
+	 * uTempData[2] - Temperature xLSB
+	 */
+	uint8_t uTempData[DF_BME280_TEMPERATURE_DATA_SIZE] = {0};
+
+	eError = this->ReadRegisters(DF_BME280_TEMPERATURE_MSB_REG, DF_BME280_TEMPERATURE_DATA_LENGTH, uTempData);
+
+	if(eError == eErrOk)
+	{
+		m_iTempUncomp = (int32_t)((((uint32_t)uTempData[DF_BME280_TEMPERATURE_MSB_DATA]) << 12U)
+								| (((uint32_t)uTempData[DF_BME280_TEMPERATURE_LSB_DATA]) << 4U)
+								| (((uint32_t)uTempData[DF_BME280_TEMPERATURE_XLSB_DATA]) >> 4U));
+	}
+
+	return eError;
 }
 
 EError BME280::CompensateTemperature(void)
@@ -424,7 +460,24 @@ EError BME280::CompensateTemperature(void)
 
 EError BME280::ReadUncompPressure(void)
 {
+	EError eError = eErrOk;
 
+	/* uPressData[0] - Pressure MSB
+	 * uPressData[1] - Pressure LSB
+	 * uPressData[2] - Pressure xLSB
+	 */
+	uint8_t uPressData[DF_BME280_PRESSURE_DATA_SIZE] = {0};
+
+	eError = this->ReadRegisters(DF_BME280_TEMPERATURE_MSB_REG, DF_BME280_TEMPERATURE_DATA_LENGTH, uPressData);
+
+	if(eError == eErrOk)
+	{
+		m_uPressUncomp = (uint32_t)((((uint32_t)uPressData[DF_BME280_PRESSURE_MSB_DATA]) << 12U)
+								| (((uint32_t)uPressData[DF_BME280_PRESSURE_LSB_DATA]) << 4U)
+								| (((uint32_t)uPressData[DF_BME280_PRESSURE_XLSB_DATA]) >> 4U));
+	}
+
+	return eError;
 }
 
 EError BME280::CompensatePressure(void)
@@ -434,7 +487,22 @@ EError BME280::CompensatePressure(void)
 
 EError BME280::ReadUncompHumidity(void)
 {
+	EError eError = eErrOk;
 
+	/* uHumidData[0] - Humidity MSB
+	 * uHumidData[1] - Humidity LSB
+	 */
+	uint8_t uHumidData[DF_BME280_HUMIDITY_DATA_SIZE] = {0};
+
+	eError = this->ReadRegisters(DF_BME280_TEMPERATURE_MSB_REG, DF_BME280_TEMPERATURE_DATA_LENGTH, uHumidData);
+
+	if(eError == eErrOk)
+	{
+		m_iHumidUncomp = (int32_t)((((uint32_t)uHumidData[DF_BME280_HUMIDITY_MSB_DATA]) << 8U)
+								| ((uint32_t)uHumidData[DF_BME280_HUMIDITY_LSB_DATA]));
+	}
+
+	return eError;
 }
 
 EError BME280::CompensateHumidity(void)
