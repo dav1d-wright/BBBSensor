@@ -1,9 +1,23 @@
-/*
- * I2CDevice.cpp
- *
- *  Created on: 10 May 2016
- *      Author: David Wright
- */
+/**----------------------------------------------------------------------------
+	\file		I2CDevice.cpp
+	\author		D. Wright
+	\version	0
+
+	\brief Class that implements a generic I2C Device on an embedded linux platform.
+
+	Long comment on this file.
+
+  ----------------------------------------------------------------------------*/
+
+/*!	\defgroup Devices Higher functionality devices.
+	\{
+*/
+
+/*!	\defgroup DEV_I2C I2C Device (I2C)
+ 	 * \brief The I2C device handles the I2C communication from the BeagleBone master to the slave device.
+	\{
+*/
+
 /*----------------------------------------------------------------------------*/
 /* includes */
 /*----------------------------------------------------------------------------*/
@@ -51,6 +65,17 @@ I2CDevice::~I2CDevice(void)
 	}
 }
 
+/*----------------------------------------------------------------------------*/
+/*!
+	\pre
+	Constructor has been called.
+
+	\post
+	BeagleBone has been connected to I2C slave.
+
+	Opens an I2C bus with the assigned bus number and then connects to this I2C bus.
+*/
+/*----------------------------------------------------------------------------*/
 EError I2CDevice::Open(void)
 {
 	EError eError = eErrOk;
@@ -92,6 +117,17 @@ EError I2CDevice::Open(void)
 	return eError;
 }
 
+/*----------------------------------------------------------------------------*/
+/*!
+	\pre
+	None.
+
+	\post
+	BeagleBone has been disconnected from I2C slave.
+
+	Closes the connection to the I2C bus.
+*/
+/*----------------------------------------------------------------------------*/
 void I2CDevice::Close(void)
 {
 	close(m_iDeviceFile);

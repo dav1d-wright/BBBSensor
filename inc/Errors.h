@@ -1,22 +1,47 @@
-/*
- * Errors.h
- *
- *  Created on: 11 May 2016
- *      Author: David Wright
- */
+/**----------------------------------------------------------------------------
+	\file		Errors.h
+	\author		D. Wright
+	\version	0
 
-#ifndef INC_ERRORS_H_
-#define INC_ERRORS_H_
+	\brief Global error codes.
 
+	Long comment on this file.
+
+  ----------------------------------------------------------------------------*/
+
+#ifndef INC_ERRORS_H
+#define INC_ERRORS_H
+
+
+/*----------------------------------------------------------------------------*/
+
+/*!	\defgroup Errors Global error code list.
+	\brief Global list of error codes.
+
+	\{
+*/
+
+
+/*----------------------------------------------------------------------------*/
+/*!	\brief Error codes
+*/
 typedef enum
 {
+	/*!	\brief No error.*/
 	eErrOk = 0,
-	eErrI2CBusNumber,						/* Wrong I2C bus number */
-	eErrI2CCannotOpenBus,					/* Cannot open I2C bus */
-	eErrI2CCannotConnect,					/* Cannot connect to I2C device */
-	eErrI2CCannotWrite,						/* Cannot write to I2C device */
-	eErrI2CCannotRead,						/* Cannot read from I2C device */
-	eErrBME280PressCompDiv0					/* Division by zero during pressure compensation */
+
+	/*! \brief Wrong I2C bus number */
+	eErrI2CBusNumber,
+	/*! \brief Cannot open I2C bus */
+	eErrI2CCannotOpenBus,
+	/*! \brief Cannot connect to I2C device */
+	eErrI2CCannotConnect,
+	/*! \brief Cannot write to I2C device */
+	eErrI2CCannotWrite,
+	/*! \brief Cannot read from I2C device */
+	eErrI2CCannotRead,
+	/*! \brief Division by zero during pressure compensation */
+	eErrBME280PressCompDiv0
 }EError;
 
 
