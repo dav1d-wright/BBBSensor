@@ -30,6 +30,8 @@
 # Output folders
 Debug/
 Release/
+doc/latex/
+doc/html/
 
 # Backup files
 *~
