@@ -40,6 +40,24 @@ typedef enum
 	eErrI2CCannotWrite,
 	/*! \brief Cannot read from I2C device */
 	eErrI2CCannotRead,
+	/*! \brief BME280 init failed */
+	eErrBME280Init,
+	/*! \brief BME280 setting power mode failed */
+	eErrBME280SetPowerMode,
+	/*! \brief BME280 setting standby duration failed */
+	eErrBME280SetStandbyDuration,
+	/*! \brief BME280 setting humidity oversampling failed */
+	eErrBME280SetOversampHumidity,
+	/*! \brief BME280 setting pressure oversampling failed */
+	eErrBME280SetOversampPressure,
+	/*! \brief BME280 setting temperature oversampling failed */
+	eErrBME280SetOversampTemperature,
+	/*! \brief BME280 reading uncompensated humidity failed */
+	eErrBME280ReadUncompHumidity,
+	/*! \brief BME280 reading uncompensated pressure failed */
+	eErrBME280ReadUncompPressure,
+	/*! \brief BME280 reading uncompensated temperature failed */
+	eErrBME280ReadUncompTemperature,
 	/*! \brief Division by zero during pressure compensation */
 	eErrBME280PressCompDiv0
 }EError;
