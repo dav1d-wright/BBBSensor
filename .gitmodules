@@ -1,3 +1,0 @@
-[submodule "inc/BME280"]
-	path = inc/BME280
-	url = git@github.com:nm4d/BME280_driver.git
