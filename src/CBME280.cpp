@@ -5,6 +5,7 @@
  *      Author: z003nc3v
  */
 
+#include <stdint.h>
 #include "CBME280.h"
 #include "BME280/bme280.h"
 #include <stdio.h>

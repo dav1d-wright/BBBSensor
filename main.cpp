@@ -8,19 +8,19 @@
 #include <iostream>
 #include <stdint.h>
 #include <Errors.h>
-#include <BME280.h>
+#include <CBME280.h>
 
 using namespace std;
 
 int main(void)
 {
-	BME280 cBme280(0, 0);
+//	CBME280 cBme280(0, 0);
+//
+//	if(cBme280.Init() == 0)
+//	{
+//
+//	}
 
-	if(cBme280.Init() == 0)
-	{
-
-	}
-
-	cout << "!Hello hard float world!" << endl;
+	cout << "Hello remote Beaglebone!" << endl;
 	return 0;
 }
