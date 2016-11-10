@@ -27,11 +27,11 @@ class I2CDevice
 {
 private:
 	uint8_t m_uBusNumber;
-	uint8_t m_uDeviceId;
+	uint8_t m_uAddress;
 	int32_t m_iDeviceFile;
 
 public:
-	I2CDevice(uint8_t auBusNumber, uint16_t auDeviceId);
+	I2CDevice(uint8_t auBusNumber, uint8_t auAddress);
 	~I2CDevice(void);
 	/*!	\brief Open I2C bus.
 		\param None.
@@ -45,6 +45,7 @@ public:
 	virtual void Close(void);
 	virtual EError Write(uint8_t auValue);
 	virtual EError WriteRegister(uint8_t auRegisterAddress, uint8_t auValue);
+	virtual EError WriteRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters, uint8_t* apuValues);
 	virtual EError ReadRegister(uint8_t auRegisterAddress, uint8_t* apuReadValue);
 	virtual EError ReadRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters, uint8_t* apuReadValues);
 	virtual EError DumpRegisters(uint8_t auNumRegisters);

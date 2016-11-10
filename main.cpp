@@ -16,12 +16,10 @@ using namespace std;
 
 int main(void)
 {
-//	CBME280 cBme280(0, 0);
-//
-//	if(cBme280.Init() == 0)
-//	{
-//
-//	}
+	if(gcBme280.init() == eErrOk)
+	{
+
+	}
 
 	cout << "Hello remote Beaglebone!" << endl;
 

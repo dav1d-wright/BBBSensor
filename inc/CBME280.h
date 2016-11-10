@@ -8,10 +8,19 @@
 #ifndef CBME280_CBME280_H_
 #define CBME280_CBME280_H_
 
-#include "BME280/bme280.h"
 #include "Errors.h"
+#include "BME280/bme280.h"
+#include "I2CDevice.h"
 
-class CBME280 {
+/*----------------------------------------------------------------------------*/
+/* Function declarations */
+/*----------------------------------------------------------------------------*/
+int8_t writeCallBack(uint8_t auDeviceAddress, uint8_t auRegisterAddress, uint8_t* apuRegisterData, uint8_t auNumRegisters);
+int8_t readCallBack(uint8_t auDeviceAddress, uint8_t auRegisterAddress, uint8_t* apuRegisterData, uint8_t auNumRegisters);
+void milliSleep(const uint32_t auMillis);
+
+class CBME280: public I2CDevice
+{
 private:
 	bme280_t m_bme280;
 
@@ -35,7 +44,13 @@ private:
 
 
 public:
-	CBME280(uint8_t auPowerMode, uint8_t auStandbyDuration, uint8_t auOversampTemperature, uint8_t auOversampPressure, uint8_t auOversampHumidity);
+	CBME280(uint8_t auPowerMode = BME280_NORMAL_MODE,
+			uint8_t auStandbyDuration = BME280_STANDBY_TIME_1_MS,
+			uint8_t auOversampTemperature = BME280_OVERSAMP_1X,
+			uint8_t auOversampPressure = BME280_OVERSAMP_1X,
+			uint8_t auOversampHumidity = BME280_OVERSAMP_1X,
+			uint8_t auBusNumber = 2,
+			uint8_t auAddress = 0x77);
 	virtual ~CBME280();
 
 	EError init(void);
@@ -52,9 +67,13 @@ public:
 	EError readUncompTemperature(void);
 	EError readUncompValues(void);
 
+
 	EError compensateHumidity(void);
 	EError compensatePressure(void);
 	EError compensateTemperature(void);
 };
+
+/* Global CBME280 object */
+extern CBME280 gcBme280;
 
 #endif /* CBME280_CBME280_H_ */

@@ -29,8 +29,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <linux/i2c.h>
-#include <linux/i2c-dev.h>
+
 
 #include <Errors.h>
 #include <I2CDevice.h>
@@ -38,21 +37,22 @@ using namespace std;
 /*----------------------------------------------------------------------------*/
 /* definitions */
 /*----------------------------------------------------------------------------*/
-#define DF_BBB_PATH_I2C0 "/dev/i2c-0"
-#define DF_BBB_PATH_I2C1 "/dev/i2c-1"
-/*----------------------------------------------------------------------------*/
-/* global variables */
-/*----------------------------------------------------------------------------*/
+/* !Note!: use I2C2 with the following Pins on header P9 (closer to 5V plug):
+ * GND = 1
+ * Vin = 3
+ * SCK = 19
+ * SDI = 20
+ */
+const string sI2C0Path = "/dev/i2c-0";
+const string sI2C1Path = "/dev/i2c-1";
+const string sI2C2Path = "/dev/i2c-2";
 
-/*----------------------------------------------------------------------------*/
-/* forward declarations */
-/*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
 /* implementations */
 /*----------------------------------------------------------------------------*/
-I2CDevice::I2CDevice(uint8_t auBusNumber, uint16_t auDeviceId):
-m_uBusNumber(auBusNumber), m_uDeviceId(auDeviceId)
+I2CDevice::I2CDevice(uint8_t auBusNumber, uint8_t auAddress):
+m_uBusNumber(auBusNumber), m_uAddress(auAddress)
 {
 	m_iDeviceFile = -1;
 }
@@ -82,11 +82,15 @@ EError I2CDevice::Open(void)
 	string sName;
 	if(m_uBusNumber == 0)
 	{
-		sName = DF_BBB_PATH_I2C0;
+		sName = sI2C0Path;
 	}
 	else if(m_uBusNumber == 1)
 	{
-		sName = DF_BBB_PATH_I2C1;
+		sName = sI2C1Path;
+	}
+	else if(m_uBusNumber == 2)
+	{
+		sName = sI2C2Path;
 	}
 	else
 	{
@@ -106,7 +110,7 @@ EError I2CDevice::Open(void)
 
 		if(eError == eErrOk)
 		{
-			if(ioctl(m_iDeviceFile, I2C_SLAVE, m_uDeviceId) < 0)
+			if(ioctl(m_iDeviceFile, I2C_SLAVE, m_uAddress) < 0)
 			{
 				perror("I2C: Failed to connect to the device.\n");
 				eError = eErrI2CCannotConnect;
@@ -137,8 +141,8 @@ void I2CDevice::Close(void)
 EError I2CDevice::Write(uint8_t auValue)
 {
 	EError eError = eErrOk;
-
-	if(write(m_iDeviceFile, &auValue, 1) != 1)
+	int8_t uValuesWritten = write(m_iDeviceFile, &auValue, 1);
+	if(uValuesWritten != 1)
 	{
 		perror("I2C: Failed to write to device.\n");
 		eError = eErrI2CCannotWrite;
@@ -148,14 +152,28 @@ EError I2CDevice::Write(uint8_t auValue)
 
 EError I2CDevice::WriteRegister(uint8_t auRegisterAddress, uint8_t auValue)
 {
-	EError eError = eErrOk;
-	uint8_t yuBuffer[] = {auRegisterAddress, auValue};
+	return this->WriteRegisters(auRegisterAddress, 1, &auValue);
+}
 
-	if(write(m_iDeviceFile, yuBuffer, 2) != 2)
+EError I2CDevice::WriteRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters, uint8_t* apuValues)
+{
+	EError eError = eErrOk;
+	uint8_t* yuBuffer = new uint8_t[auNumRegisters + 1];
+	yuBuffer[0] = auRegisterAddress;
+	uint8_t uValuesWritten;
+
+	for(uint8_t u = 0; u < auNumRegisters; u++)
+	{
+		yuBuffer[u+1] = apuValues[u];
+	}
+
+	uValuesWritten = write(m_iDeviceFile, yuBuffer, auNumRegisters + 1);
+	if(uValuesWritten != auNumRegisters + 1)
 	{
 		perror("I2C: Failed to write to device.\n");
 		eError = eErrI2CCannotWrite;
 	}
+	delete [] yuBuffer;
 	return eError;
 }
 
@@ -166,15 +184,20 @@ EError I2CDevice::ReadRegister(uint8_t auRegisterAddress, uint8_t* apuReadValue)
 
 EError I2CDevice::ReadRegisters(uint8_t auRegisterAddress, uint8_t auNumRegisters, uint8_t* apuReadValues)
 {
-	EError eError = eErrOk;
+	EError eError;
+	uint8_t uRegistersRead;
 
-	this->Write(auRegisterAddress);
+	eError = this->Write(auRegisterAddress);
 
-	if(read(m_iDeviceFile, apuReadValues, auNumRegisters) != auNumRegisters)
+	if(eError == eErrOk)
 	{
-		perror("I2C: Failed to read values from device register.\n");
-		apuReadValues = NULL;
-		eError = eErrI2CCannotRead;
+		uRegistersRead = read(m_iDeviceFile, apuReadValues, auNumRegisters);
+		if(uRegistersRead != auNumRegisters)
+		{
+			perror("I2C: Failed to read values from device register.\n");
+			apuReadValues = NULL;
+			eError = eErrI2CCannotRead;
+		}
 	}
 
 	return eError;

@@ -10,41 +10,82 @@
 #include "BME280/bme280.h"
 #include <stdio.h>
 #include <iostream>
+#include <unistd.h>
 #include "Errors.h"
 
 using namespace std;
 
-CBME280::CBME280(uint8_t auPowerMode, uint8_t auStandbyDuration, uint8_t auOversampTemperature, uint8_t auOversampPressure, uint8_t auOversampHumidity):
-		m_uPowerMode(auPowerMode), m_uStandbyDuration(auStandbyDuration), m_uOversampTemperature(auOversampTemperature), m_uOversampPressure(auOversampPressure), m_uOversampHumidity(auOversampHumidity)
+/* Global CBME280 object */
+CBME280 gcBme280;
+
+int8_t writeCallBack(uint8_t auDeviceAddress, uint8_t auRegisterAddress, uint8_t* apuRegisterData, uint8_t auNumRegisters)
+{
+	int8_t iRet = 0;
+	EError eRet = gcBme280.WriteRegisters(auRegisterAddress, auNumRegisters, apuRegisterData);
+	if(eRet != eErrOk)
+	{
+		iRet = -1;
+	}
+	return iRet;
+}
+
+int8_t readCallBack(uint8_t auDeviceAddress, uint8_t auRegisterAddress, uint8_t* apuRegisterData, uint8_t auNumRegisters)
+{
+	int8_t iRet = 0;
+	EError eRet = gcBme280.ReadRegisters(auRegisterAddress, auNumRegisters, apuRegisterData);
+	if(eRet != eErrOk)
+	{
+		iRet = -1;
+	}
+	return iRet;
+}
+
+void milliSleep(const uint32_t auMillis)
+{
+	usleep(auMillis*1000);
+}
+
+CBME280::CBME280(uint8_t auPowerMode, uint8_t auStandbyDuration, uint8_t auOversampTemperature, uint8_t auOversampPressure, uint8_t auOversampHumidity, uint8_t auBusNumber, uint8_t auDeviceId):
+		I2CDevice(auBusNumber, auDeviceId), m_uPowerMode(auPowerMode), m_uStandbyDuration(auStandbyDuration), m_uOversampTemperature(auOversampTemperature), m_uOversampPressure(auOversampPressure), m_uOversampHumidity(auOversampHumidity)
 {
 
 }
 
-CBME280::~CBME280() {
-	// TODO Auto-generated destructor stub
+CBME280::~CBME280()
+{
+
 }
 
 EError CBME280::init(void)
 {
-	int32_t iResult = bme280_init(&m_bme280);
-	EError eError;
 
-	if(iResult != SUCCESS)
+	int32_t iResult = 0;
+	EError eError = this->Open();
+
+	if(eError == eErrOk)
 	{
-		perror("BME280: Init failed.");
-		eError = eErrBME280Init;
-	}
-	else
-	{
-		eError = this->setPowerMode(m_uPowerMode);
-		if(eError == eErrOk)
+		m_bme280.bus_read = readCallBack;
+		m_bme280.bus_write = writeCallBack;
+		m_bme280.dev_addr = BME280_I2C_ADDRESS2;
+		m_bme280.delay_msec = 	milliSleep;
+
+		iResult = bme280_init(&m_bme280);
+
+		if(iResult != SUCCESS)
 		{
-			eError = this->setStandbyDuration(m_uStandbyDuration);
+			perror("BME280: Init failed.");
+			eError = eErrBME280Init;
+		}
+		else
+		{
+			eError = this->setPowerMode(m_uPowerMode);
 			if(eError == eErrOk)
 			{
+				eError = this->setStandbyDuration(m_uStandbyDuration);
 			}
 		}
 	}
+	return eError;
 }
 
 EError CBME280::setPowerMode(uint8_t auPowerMode)
