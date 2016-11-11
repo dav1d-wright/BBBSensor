@@ -81,7 +81,22 @@ EError CBME280::init(void)
 			eError = this->setPowerMode(m_uPowerMode);
 			if(eError == eErrOk)
 			{
-				eError = this->setStandbyDuration(m_uStandbyDuration);
+				if(eError == eErrOk)
+				{
+					eError = this->setOversampHumidity(BME280_OVERSAMP_4X);
+					if(eError == eErrOk)
+					{
+						eError = this->setOversampTemperature(BME280_OVERSAMP_4X);
+						if(eError == eErrOk)
+						{
+							eError = this->setOversampPressure(BME280_OVERSAMP_4X);
+							if(eError == eErrOk)
+							{
+								eError = this->setStandbyDuration(m_uStandbyDuration);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -245,8 +260,8 @@ EError CBME280::readUncompValues(void)
 EError CBME280::compensateHumidity(void)
 {
 	EError eError = eErrOk;
-	m_dCompHumidity = bme280_compensate_humidity_double(m_iUncompTemperature);
-	m_uCompHumidity = bme280_compensate_humidity_int32(m_iUncompTemperature);
+	m_dCompHumidity = bme280_compensate_humidity_double(m_iUncompHumidity);
+	m_uCompHumidity = bme280_compensate_humidity_int32(m_iUncompHumidity);
 
 	return eError;
 }
@@ -267,4 +282,36 @@ EError CBME280::compensateTemperature(void)
 	m_iCompTemperature = bme280_compensate_temperature_int32(m_iUncompTemperature);
 
 	return eError;
+}
+
+EError CBME280::compensateValues(void)
+{
+	EError eError = this->compensateTemperature();
+
+	if(eError == eErrOk)
+	{
+		eError = this->compensatePressure();
+
+		if(eError == eErrOk)
+		{
+			eError = this->compensateHumidity();
+		}
+	}
+
+	return eError;
+}
+
+double CBME280::getCompensatedHumidity(void)
+{
+	return m_dCompHumidity;
+}
+
+double CBME280::getCompensatedPressure(void)
+{
+	return m_dCompPressure;
+}
+
+double CBME280::getCompensatedTemperature(void)
+{
+	return m_dCompTemperature;
 }

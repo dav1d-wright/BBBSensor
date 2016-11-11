@@ -34,13 +34,14 @@ private:
 	int32_t m_iUncompPressure = 0;
 	int32_t m_iUncompHumidity = 0;
 
-	int32_t m_iCompTemperature = 0;
-	uint32_t m_uCompPressure = 0;
-	uint32_t m_uCompHumidity = 0;
 
-	double m_dCompTemperature = 0.0;
-	double m_dCompPressure = 0.0;
-	double m_dCompHumidity = 0.0;
+	int32_t m_iCompTemperature = 0; 	// In centi-degrees celsius. -> A value of 3223 is 32.23°C
+	uint32_t m_uCompPressure = 0;		// In Pascal
+	uint32_t m_uCompHumidity = 0;		// %rH in Q22.10 Format: 22 integer and 10 Fractional bits: A value of 42313 is 42313 / 1024 = 41.321 %rH
+
+	double m_dCompTemperature = 0.0;	// In degrees Celsius
+	double m_dCompPressure = 0.0;		// In Pascal
+	double m_dCompHumidity = 0.0;		// In %rH
 
 
 public:
@@ -71,6 +72,11 @@ public:
 	EError compensateHumidity(void);
 	EError compensatePressure(void);
 	EError compensateTemperature(void);
+	EError compensateValues(void);
+
+	double getCompensatedHumidity(void);
+	double getCompensatedPressure(void);
+	double getCompensatedTemperature(void);
 };
 
 /* Global CBME280 object */

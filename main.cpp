@@ -16,36 +16,36 @@ using namespace std;
 
 int main(void)
 {
-	if(gcBme280.init() == eErrOk)
+	double dTemp;
+	double dPress;
+	double dHumid;
+	EError eError = gcBme280.init();
+
+	if(eError == eErrOk)
 	{
+		cout << "Init successful!" << endl;
 
-	}
-
-	cout << "Hello remote Beaglebone!" << endl;
-
-	FILE *LedHandle = NULL;
-
-	const char* brightness = "/sys/class/leds/beaglebone:green:usr3/brightness";
-
-	for(uint8_t i = 0; i < 10; i++)
-	{
-		if((LedHandle = fopen(brightness, "r+")) != NULL)
+		while(eError == eErrOk)
 		{
-			fwrite("1", sizeof(char), 1, LedHandle);
-			fclose(LedHandle);
-		}
+			eError = gcBme280.readUncompValues();
 
-		sleep(1);
+			if(eError == eErrOk)
+			{
+				eError = gcBme280.compensateValues();
+				if(eError == eErrOk)
+				{
+					dTemp = gcBme280.getCompensatedTemperature();
+					dPress = gcBme280.getCompensatedPressure();
+					dHumid = gcBme280.getCompensatedHumidity();
 
-		if((LedHandle = fopen(brightness, "r+")) != NULL)
-		{
-			fwrite("0", sizeof(char), 1, LedHandle);
-			fclose(LedHandle);
+					cout << "Temperature = " << dTemp << "°C | "
+						<< "Pressure = " << dPress << "Pa | "
+						<< "Humidity = " << dHumid << "%rH" << endl;
+					sleep(1);
+				}
+			}
 		}
-		sleep(1);
 	}
-
-	cout << "Goodbye remote Beaglebone!" << endl;
 
 	return 0;
 }
