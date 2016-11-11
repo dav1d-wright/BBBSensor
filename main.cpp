@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <Errors.h>
 #include <CBME280.h>
+#include "libpq-fe.h"
 
 using namespace std;
 
@@ -19,6 +20,8 @@ int main(void)
 	double dTemp;
 	double dPress;
 	double dHumid;
+    PGconn     *conn;
+    PGresult   *res;
 	EError eError = gcBme280.init();
 
 	if(eError == eErrOk)
