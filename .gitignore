@@ -33,6 +33,9 @@ Release/
 doc/latex/
 doc/html/
 
+# PostgreSQL library folder
+inc/libpq
+
 # Backup files
 *~
 
