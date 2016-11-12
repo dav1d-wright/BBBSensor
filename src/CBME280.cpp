@@ -315,3 +315,22 @@ double CBME280::getCompensatedTemperature(void)
 {
 	return m_dCompTemperature;
 }
+
+EError CBME280::run(void)
+{
+	EError eError = this->readUncompValues();
+
+	if(eError == eErrOk)
+	{
+		eError = this->compensateValues();
+		if(eError == eErrOk)
+		{
+			cout << "Temperature = " << m_dCompTemperature << "°C | "
+				<< "Pressure = " << m_dCompPressure << "Pa | "
+				<< "Humidity = " << m_dCompHumidity << "%rH" << endl;
+			sleep(1);
+		}
+	}
+
+	return eError;
+}

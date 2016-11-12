@@ -77,6 +77,8 @@ public:
 	double getCompensatedHumidity(void);
 	double getCompensatedPressure(void);
 	double getCompensatedTemperature(void);
+
+	EError run(void);
 };
 
 /* Global CBME280 object */

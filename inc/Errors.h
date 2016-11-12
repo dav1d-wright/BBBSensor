@@ -59,7 +59,11 @@ typedef enum
 	/*! \brief BME280 reading uncompensated temperature failed */
 	eErrBME280ReadUncompTemperature,
 	/*! \brief Division by zero during pressure compensation */
-	eErrBME280PressCompDiv0
+	eErrBME280PressCompDiv0,
+	/*! \brief Creation of DB failed. */
+	eErrPgSqlCreateDb,
+	/*! \brief Creation of DB Table failed. */
+	eErrPgSqlCreateTab
 }EError;
 
 

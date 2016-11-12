@@ -9,44 +9,33 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <string>
+using namespace std;
+
 #include <Errors.h>
 #include <CBME280.h>
 #include "libpq-fe.h"
+#include "CPgSql.h"
 
-using namespace std;
 
 int main(void)
 {
 	double dTemp;
 	double dPress;
 	double dHumid;
-    PGconn     *conn;
-    PGresult   *res;
+	CPgSql cPgSqlDb("weatherman");
+
 	EError eError = gcBme280.init();
 
 	if(eError == eErrOk)
 	{
 		cout << "Init successful!" << endl;
 
+		eError = cPgSqlDb.init();
+
 		while(eError == eErrOk)
 		{
-			eError = gcBme280.readUncompValues();
-
-			if(eError == eErrOk)
-			{
-				eError = gcBme280.compensateValues();
-				if(eError == eErrOk)
-				{
-					dTemp = gcBme280.getCompensatedTemperature();
-					dPress = gcBme280.getCompensatedPressure();
-					dHumid = gcBme280.getCompensatedHumidity();
-
-					cout << "Temperature = " << dTemp << "°C | "
-						<< "Pressure = " << dPress << "Pa | "
-						<< "Humidity = " << dHumid << "%rH" << endl;
-					sleep(1);
-				}
-			}
+			gcBme280.run();
 		}
 	}
 
